@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MathMaster - Slides de Matemática Prontos</title>
+    <meta name="description" content="Aulas prontas e visuais de matemática do Fundamental 2 ao Médio." />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide-react@0.344.0/dist/umd/lucide-react.js"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Sora', 'sans-serif'],
+              hand: ['Patrick Hand', 'cursive'],
+            },
+            colors: {
+              brand: {
+                50: '#eef2ff',
+                100: '#e0e7ff',
+                200: '#c7d2fe',
+                300: '#a5b4fc',
+                400: '#818cf8',
+                500: '#6366f1',
+                600: '#4f46e5', // Primary Indigo
+                700: '#4338ca',
+                800: '#3730a3',
+                900: '#312e81',
+              },
+              accent: {
+                50: '#fffbeb',
+                100: '#fef3c7',
+                200: '#fde68a',
+                300: '#fcd34d',
+                400: '#fbbf24',
+                500: '#f59e0b', // Teacher Yellow
+                600: '#d97706',
+              },
+              paper: {
+                50: '#f8fafc',
+                100: '#f1f5f9',
+              }
+            },
+            backgroundImage: {
+              'dots': "radial-gradient(#cbd5e1 1.5px, transparent 1.5px)",
+            },
+            boxShadow: {
+              'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+              'glow': '0 0 20px rgba(99, 102, 241, 0.3)',
+            },
+            animation: {
+              'float': 'float 6s ease-in-out infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        scroll-behavior: smooth;
+      }
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      .no-scrollbar::-webkit-scrollbar {
+          display: none;
+      }
+      /* Hide scrollbar for IE, Edge and Firefox */
+      .no-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+      }
+    </style>
+  </head>
+  <body class="bg-white text-slate-800 antialiased selection:bg-brand-200 selection:text-brand-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState } = React;
+      const { 
+        CheckCircle, ArrowRight, Star, Clock, Layout, Type, Image: ImageIcon, MousePointer2,
+        Edit3, MonitorPlay, Palette, Gift, DownloadCloud, BookOpen,
+        Calculator, PieChart, Shapes, Ruler, Sigma, Banknote,
+        ChevronDown, ChevronUp, Check, FileText, Quote,
+        ShieldCheck, Zap, ZoomIn, Maximize2, Monitor
+      } = lucideReact;
+
+      // --- CONSTANTS ---
+      const CURRICULUM = [
+        {
+          id: '1',
+          title: 'Geometria Plana e Espacial',
+          description: 'Figuras, áreas, volumes e propriedades visualizadas em 3D.',
+          topics: ['Triângulos', 'Polígonos', 'Prismas', 'Cilindros'],
+          lessons: [
+              "Ponto, Reta e Plano: Conceitos Primitivos",
+              "Ângulos: Definição e Classificação",
+              "Triângulos: Propriedades e Classificação",
+              "Teorema de Pitágoras (com demonstração visual)",
+              "Polígonos Regulares e suas Propriedades",
+              "Áreas de Figuras Planas",
+              "Prismas e Pirâmides: Elementos e Planificação",
+              "Cilindros, Cones e Esferas: Volume e Área",
+              "Geometria de Posição: Retas e Planos no Espaço"
+          ],
+          iconName: 'geometry'
+        },
+        {
+          id: '2',
+          title: 'Álgebra Fundamental',
+          description: 'Do básico às equações complexas com passo-a-passo animado.',
+          topics: ['Equações', 'Expressões', 'Fatoração', 'Polinômios'],
+          lessons: [
+              "Introdução à Linguagem Algébrica",
+              "Equações do 1º Grau: Resolução Prática",
+              "Sistemas de Equações do 1º Grau",
+              "Potenciação e Radiciação",
+              "Polinômios: Adição, Subtração e Multiplicação",
+              "Produtos Notáveis (Quadrado da Soma/Diferença)",
+              "Fatoração Algébrica: Casos Principais",
+              "Frações Algébricas e Simplificação",
+              "Equações do 2º Grau: Fórmula de Bhaskara"
+          ],
+          iconName: 'algebra'
+        },
+        {
+          id: '3',
+          title: 'Funções e Gráficos',
+          description: 'Comportamento de funções explicado com gráficos dinâmicos.',
+          topics: ['Afim', 'Quadrática', 'Exponencial', 'Logarítmica'],
+          lessons: [
+              "O Conceito de Função: Domínio e Imagem",
+              "Função Afim (1º Grau): Taxa de Variação",
+              "Construção de Gráficos de Função Afim",
+              "Função Quadrática: Concavidade e Vértice",
+              "Zeros da Função Quadrática",
+              "Função Exponencial: Crescimento e Decaimento",
+              "Introdução aos Logaritmos",
+              "Função Logarítmica e seus Gráficos",
+              "Inequações do 1º e 2º Grau"
+          ],
+          iconName: 'functions'
+        },
+        {
+          id: '4',
+          title: 'Trigonometria',
+          description: 'O ciclo trigonométrico desmistificado com animações.',
+          topics: ['Razões', 'Ciclo', 'Identidades', 'Leis Seno/Cosseno'],
+          lessons: [
+              "Razões Trigonométricas no Triângulo Retângulo",
+              "Seno, Cosseno e Tangente: Ângulos Notáveis",
+              "Lei dos Senos e Lei dos Cossenos",
+              "Introdução ao Ciclo Trigonométrico",
+              "Arcos e Ângulos (Graus e Radianos)",
+              "Redução ao Primeiro Quadrante",
+              "Funções Trigonométricas: Seno e Cosseno",
+              "Relações Fundamentais e Identidades",
+              "Equações Trigonométricas Simples"
+          ],
+          iconName: 'trigonometry'
+        },
+        {
+          id: '5',
+          title: 'Estatística e Probabilidade',
+          description: 'Dados reais e visualização gráfica moderna.',
+          topics: ['Média/Moda/Mediana', 'Gráficos', 'Análise Combinatória'],
+          lessons: [
+              "População, Amostra e Variáveis",
+              "Tabelas de Frequência e Histogramas",
+              "Leitura e Interpretação de Gráficos",
+              "Medidas de Tendência Central (Média, Moda, Mediana)",
+              "Medidas de Dispersão (Desvio Padrão e Variância)",
+              "Princípio Fundamental da Contagem",
+              "Arranjos, Combinações e Permutações",
+              "Introdução à Probabilidade",
+              "Probabilidade Condicional e Eventos Independentes"
+          ],
+          iconName: 'statistics'
+        },
+        {
+          id: '6',
+          title: 'Matemática Financeira',
+          description: 'Juros e porcentagem aplicados ao dia a dia.',
+          topics: ['Juros Simples', 'Juros Compostos', 'Amortização'],
+          lessons: [
+              "Razão, Proporção e Regra de Três",
+              "Porcentagem: Aumentos e Descontos Sucessivos",
+              "Juros Simples: Montante e Capital",
+              "Juros Compostos: O Poder do Tempo",
+              "Equivalência de Taxas",
+              "Sistemas de Amortização (SAC e Price)",
+              "Inflação e Poder de Compra",
+              "Análise de Investimentos Básicos",
+              "Planejamento Financeiro Pessoal"
+          ],
+          iconName: 'financial'
+        }
+      ];
+
+      const TESTIMONIALS = [
+        {
+          id: 1,
+          name: "Prof. Roberto Mendes",
+          role: "Rede Estadual - SP",
+          content: "Eu levava cerca de 4 horas para montar uma aula de Geometria Espacial decente. Com o kit, eu ajusto em 15 minutos. Meus alunos finalmente entenderam a diferença entre área e volume.",
+          rating: 5,
+          image: "https://picsum.photos/seed/roberto/100/100"
+        },
+        {
+          id: 2,
+          name: "Juliana Castro",
+          role: "Ensino Médio Particular",
+          content: "O visual é impecável. Não tem cara de 'slide velho'. Os alunos prestam mais atenção porque as animações guiam o raciocínio. Valeu cada centavo.",
+          rating: 5,
+          image: "https://picsum.photos/seed/juliana/100/100"
+        },
+        {
+          id: 3,
+          name: "Carlos Eduardo",
+          role: "Professor Particular",
+          content: "Uso nas minhas aulas particulares e o valor percebido pelos pais aumentou muito. Pareço muito mais profissional apresentando esse material.",
+          rating: 5,
+          image: "https://picsum.photos/seed/carlos/100/100"
+        }
+      ];
+
+      const FAQ_ITEMS = [
+        {
+          question: "Preciso ter conhecimento avançado em PowerPoint?",
+          answer: "Não! Os slides são feitos para serem intuitivos. Você só precisa clicar nas caixas de texto para mudar os exemplos ou nomes. As animações já estão prontas."
+        },
+        {
+          question: "Funciona no Google Slides ou Canva?",
+          answer: "O foco principal é PowerPoint (.pptx) para garantir que as animações complexas funcionem perfeitamente. Você pode importar no Google Slides, mas algumas animações específicas podem precisar de ajustes."
+        },
+        {
+          question: "O acesso é vitalício?",
+          answer: "Sim! Comprou, baixou, é seu para sempre. Você também recebe atualizações gratuitas por 1 ano na área de membros."
+        },
+        {
+          question: "Serve para qual série?",
+          answer: "O material cobre todo o currículo da BNCC do 6º ano do Fundamental ao 3º ano do Ensino Médio."
+        }
+      ];
+
+      const ICONS_MAP = {
+        geometry: Shapes,
+        algebra: Calculator,
+        functions: Sigma,
+        trigonometry: Ruler,
+        statistics: PieChart,
+        financial: Banknote
+      };
+
+      // --- COMPONENTS ---
+
+      // HERO
+      const Hero = () => {
+        return (
+          <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden bg-slate-50">
+            {/* Background Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+
+            <div className="container mx-auto px-4 relative z-10">
+              <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+                
+                {/* Text Content */}
+                <div className="lg:w-5/12 text-center lg:text-left order-2 lg:order-1">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-100 border border-orange-200 text-orange-700 text-xs font-bold mb-6 md:mb-8 uppercase tracking-wider">
+                     <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+                     PowerPoint Kit 2025
+                  </div>
+                  
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-slate-900 leading-[1.1] mb-6">
+                    Suas aulas prontas no <span className="text-[#c43e1c]">PowerPoint</span>.
+                  </h1>
+                  
+                  <p className="text-base md:text-lg text-slate-600 mb-8 leading-relaxed font-medium">
+                    Esqueça as horas formatando slides. Baixe o kit completo de Matemática (Fundamental 2 e Médio), <span className="font-bold text-slate-800">100% editável</span> e com animações que explicam por você.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+                    <a href="#pricing" className="w-full sm:w-auto px-8 py-4 bg-[#c43e1c] hover:bg-[#a03316] text-white rounded-lg font-bold text-lg shadow-xl shadow-orange-900/10 transition-all flex items-center justify-center gap-3 transform hover:-translate-y-1">
+                      Baixar Kit Completo
+                      <ArrowRight className="w-5 h-5 opacity-90" />
+                    </a>
+                    <div className="hidden sm:flex items-center gap-2 text-slate-500 px-4 py-2 bg-white rounded-lg border border-slate-200 shadow-sm">
+                       <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Microsoft_Office_PowerPoint_%282019%E2%80%93present%29.svg" alt="PPT Logo" className="w-5 h-5" />
+                       <span className="text-sm font-medium">Formato .pptx nativo</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 flex items-center justify-center lg:justify-start gap-2 text-sm text-slate-500">
+                     <CheckCircle className="w-4 h-4 text-green-500" />
+                     <span>Compatível com Windows, Mac e Tablets</span>
+                  </div>
+                </div>
+
+                {/* Hero Visual - THE POWERPOINT INTERFACE MOCKUP */}
+                <div className="lg:w-7/12 w-full relative perspective-1000 mt-4 lg:mt-0 order-1 lg:order-2">
+                   
+                   {/* The "Software" Window */}
+                   <div className="relative bg-white rounded-xl shadow-2xl border border-slate-300 overflow-hidden ring-1 ring-slate-900/5">
+                      
+                      {/* 1. Window Top Bar */}
+                      <div className="bg-[#c43e1c] h-8 md:h-10 flex items-center justify-between px-3 md:px-4">
+                         <div className="flex items-center gap-3 md:gap-4">
+                            <div className="flex gap-1.5 md:gap-2">
+                               <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-white/20 hover:bg-white/40 transition-colors"></div>
+                               <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-white/20 hover:bg-white/40 transition-colors"></div>
+                            </div>
+                            <div className="h-3 md:h-4 w-px bg-white/20"></div>
+                            <span className="text-white text-[10px] md:text-xs font-medium opacity-90 truncate max-w-[150px]">Aula 05 - Geometria.pptx</span>
+                         </div>
+                         <div className="text-white/80 text-[9px] md:text-[10px] hidden sm:block">MathMaster Licença Pro</div>
+                      </div>
+
+                      {/* 2. Ribbon (Menu Bar) */}
+                      <div className="bg-[#f3f2f1] border-b border-slate-300 py-1.5 md:py-2 px-2 md:px-4 flex items-center gap-4 md:gap-6 overflow-hidden select-none pointer-events-none">
+                         {['Página Inicial', 'Inserir', 'Desenhar', 'Design', 'Transições', 'Animações'].map((tab, i) => (
+                            <span key={i} className={`text-[10px] md:text-xs font-medium whitespace-nowrap ${i === 0 ? 'text-[#c43e1c] border-b-2 border-[#c43e1c]' : 'text-slate-600'}`}>
+                               {tab}
+                            </span>
+                         ))}
+                      </div>
+
+                      {/* 3. Toolbar (Icons) */}
+                      <div className="bg-[#f3f2f1] border-b border-slate-200 p-2 flex items-center gap-4 text-slate-500 hidden sm:flex select-none pointer-events-none">
+                         <div className="flex flex-col items-center gap-1 px-3 border-r border-slate-300">
+                            <Layout className="w-5 h-5" />
+                            <span className="text-[9px]">Layout</span>
+                         </div>
+                         <div className="flex flex-col items-center gap-1 px-3 border-r border-slate-300">
+                            <div className="font-bold font-serif text-lg leading-none">B</div>
+                            <span className="text-[9px]">Negrito</span>
+                         </div>
+                         <div className="flex flex-col items-center gap-1 px-3 border-r border-slate-300">
+                            <Type className="w-5 h-5" />
+                            <span className="text-[9px]">Texto</span>
+                         </div>
+                         <div className="flex flex-col items-center gap-1 px-3">
+                            <ImageIcon className="w-5 h-5" />
+                            <span className="text-[9px]">Imagem</span>
+                         </div>
+                      </div>
+
+                      {/* 4. Main Workspace Area */}
+                      <div className="flex bg-[#e1dfdd] h-[230px] sm:h-[320px] md:h-[450px] transition-all duration-300">
+                         
+                         {/* Left Sidebar */}
+                         <div className="w-24 md:w-32 bg-[#e1dfdd] border-r border-slate-300 p-2 md:p-3 hidden sm:flex flex-col gap-2 md:gap-3 overflow-hidden select-none pointer-events-none">
+                            {[1, 2, 3].map((num) => (
+                               <div key={num} className={`aspect-video bg-white shadow-sm flex items-center justify-center text-[8px] md:text-[10px] text-slate-300 border-2 ${num === 2 ? 'border-[#c43e1c]' : 'border-transparent'}`}>
+                                  {num === 2 ? (
+                                     <div className="w-full h-full bg-slate-100 flex flex-col p-1">
+                                        <div className="h-0.5 md:h-1 w-1/2 bg-slate-300 mb-1"></div>
+                                        <div className="h-2 md:h-4 w-full bg-slate-200"></div>
+                                     </div>
+                                  ) : (
+                                     <>Slide {num}</>
+                                  )}
+                               </div>
+                            ))}
+                         </div>
+
+                         {/* Center Stage (Canvas) */}
+                         <div className="flex-1 p-2 sm:p-4 md:p-8 flex items-center justify-center overflow-hidden relative">
+                            {/* White Slide Canvas */}
+                            <div className="bg-white shadow-[0_0_15px_rgba(0,0,0,0.1)] aspect-video w-full max-w-4xl relative group">
+                               
+                               {/* --- PLACEHOLDER PARA O SEU GIF --- */}
+                               <img 
+                                 src="https://placehold.co/800x450/ffffff/c43e1c?text=SEU+GIF+AQUI" 
+                                 alt="Slide Animado" 
+                                 className="w-full h-full object-cover"
+                               />
+                               
+                               {/* Cursor Decoration */}
+                               <div className="absolute bottom-5 right-5 md:bottom-10 md:right-10 pointer-events-none animate-bounce z-20">
+                                  <MousePointer2 className="w-4 h-4 md:w-6 md:h-6 text-slate-900 fill-white drop-shadow-md" />
+                               </div>
+
+                            </div>
+                         </div>
+
+                      </div>
+
+                      {/* 5. Bottom Status Bar */}
+                      <div className="bg-[#c43e1c] h-5 md:h-6 flex items-center justify-between px-3 text-[9px] md:text-[10px] text-white select-none pointer-events-none">
+                         <div className="flex gap-4">
+                            <span>Slide 2 de 15</span>
+                            <span className="hidden sm:inline">Português (Brasil)</span>
+                         </div>
+                         <div className="flex items-center gap-2">
+                            <span className="hidden sm:inline">Anotações</span>
+                            <div className="w-12 md:w-20 h-1 bg-white/30 rounded-full overflow-hidden">
+                               <div className="w-2/3 h-full bg-white"></div>
+                            </div>
+                            <span>68%</span>
+                         </div>
+                      </div>
+
+                   </div>
+                   <div className="absolute -z-10 -bottom-10 -right-10 w-full h-full bg-slate-200 rounded-3xl opacity-50 transform rotate-2 hidden sm:block"></div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // FEATURES
+      const Features = () => {
+        const features = [
+          {
+            icon: <Edit3 className="w-6 h-6" />,
+            title: "100% Editável (.pptx)",
+            description: "Mude cores, textos e equações. Adapte para sua turma em segundos."
+          },
+          {
+            icon: <MonitorPlay className="w-6 h-6" />,
+            title: "Animações Passo-a-Passo",
+            description: "O conteúdo aparece conforme você explica. Chega de alunos copiando sem prestar atenção."
+          },
+          {
+            icon: <Palette className="w-6 h-6" />,
+            title: "Design de Escola Premium",
+            description: "Visual limpo e moderno. Seus slides vão parecer material de sistema de ensino caro."
+          },
+          {
+            icon: <Gift className="w-6 h-6" />,
+            title: "Bônus: Curso de Edição",
+            description: "Inclui minicurso para você dominar o PowerPoint e personalizar ainda mais."
+          },
+          {
+            icon: <DownloadCloud className="w-6 h-6" />,
+            title: "Acesso Imediato",
+            description: "Comprou, baixou. Arquivos organizados em pastas por ano e assunto."
+          },
+          {
+            icon: <BookOpen className="w-6 h-6" />,
+            title: "Fiel à BNCC",
+            description: "Cobre as habilidades essenciais do 6º ao 3º ano do Ensino Médio."
+          }
+        ];
+
+        return (
+          <section className="py-20 bg-slate-50">
+            <div className="container mx-auto px-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                {features.map((feature, index) => (
+                  <div key={index} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:border-brand-200 hover:shadow-md transition-all duration-300 group">
+                    <div className="w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center mb-4 text-brand-600 group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                      {feature.icon}
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 font-display">{feature.title}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // SAMPLES
+      const Samples = () => {
+        const samples = [
+          {
+            id: 1,
+            title: "Teorema de Pitágoras",
+            level: "9º Ano",
+            image: "https://placehold.co/600x450/ffffff/2563eb?text=GIF+Pitagoras" 
+          },
+          {
+            id: 2,
+            title: "Estatística Básica",
+            level: "Ensino Médio",
+            image: "https://placehold.co/600x450/ffffff/059669?text=GIF+Estatistica"
+          },
+          {
+            id: 3,
+            title: "Função Exponencial",
+            level: "1º Ano Médio",
+            image: "https://placehold.co/600x450/ffffff/9333ea?text=GIF+Funcao"
+          }
+        ];
+
+        return (
+          <section className="py-24 bg-slate-100 border-t border-slate-200">
+            <div className="container mx-auto px-4">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                <span className="text-slate-500 font-bold tracking-widest text-xs uppercase mb-2 block">
+                   Por dentro do material
+                </span>
+                <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900">
+                  Qualidade Visual
+                </h2>
+                <p className="mt-4 text-slate-600 text-lg">
+                  Veja como os slides aparecem na sua tela de edição. Tudo limpo, organizado e pronto para projetar.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-10 max-w-7xl mx-auto">
+                {samples.map((sample) => (
+                  <div key={sample.id} className="flex flex-col">
+                     <div className="flex justify-between items-end mb-3 px-1">
+                        <h4 className="font-bold text-slate-800 text-lg">{sample.title}</h4>
+                        <span className="text-xs font-semibold text-slate-500 bg-white px-2 py-1 rounded border border-slate-200">
+                           {sample.level}
+                        </span>
+                     </div>
+                     <div className="bg-white rounded-lg shadow-lg border border-slate-300 overflow-hidden flex flex-col group hover:shadow-xl hover:ring-2 hover:ring-[#c43e1c]/20 transition-all duration-300">
+                        <div className="h-8 bg-slate-50 border-b border-slate-200 flex items-center px-3 gap-2">
+                           <div className="flex gap-1">
+                              <div className="w-2 h-2 rounded-full bg-slate-300"></div>
+                              <div className="w-2 h-2 rounded-full bg-slate-300"></div>
+                              <div className="w-2 h-2 rounded-full bg-slate-300"></div>
+                           </div>
+                           <div className="h-4 w-px bg-slate-300 mx-1"></div>
+                        </div>
+                        <div className="bg-[#e1dfdd] p-4 relative aspect-[4/3] flex items-center justify-center overflow-hidden">
+                           <div className="bg-white shadow-md w-full h-full relative group-hover:scale-[1.02] transition-transform duration-500">
+                              <img 
+                                 src={sample.image} 
+                                 alt={sample.title} 
+                                 className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                 <div className="bg-white/90 backdrop-blur text-slate-800 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                                    <Monitor className="w-3 h-3" />
+                                    Modo Apresentação
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div className="h-7 bg-white border-t border-slate-200 flex items-center justify-between px-3">
+                           <span className="text-[9px] text-slate-400 font-mono">Slide 1 de 1</span>
+                           <div className="flex items-center gap-2">
+                              <ZoomIn className="w-3 h-3 text-slate-400" />
+                              <div className="w-16 h-1 bg-slate-200 rounded-full overflow-hidden">
+                                 <div className="w-1/2 h-full bg-slate-400"></div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-16 text-center">
+                 <a href="#pricing" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-300 hover:border-[#c43e1c] text-slate-700 hover:text-[#c43e1c] rounded-full font-bold transition-all shadow-sm group">
+                    Explorar a Biblioteca Completa
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                 </a>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // CURRICULUM
+      const CurriculumCard = ({ item }) => {
+          const [isOpen, setIsOpen] = useState(false);
+          const Icon = ICONS_MAP[item.iconName];
+
+          return (
+              <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-transparent hover:border-brand-200 group flex flex-col overflow-hidden">
+                  <div className="p-6 pb-4">
+                      <div className="flex items-start justify-between mb-4">
+                          <div className="p-3 rounded-xl bg-brand-50 text-brand-600 group-hover:bg-brand-600 group-hover:text-white transition-all">
+                              <Icon className="w-7 h-7" />
+                          </div>
+                          <span className="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded border border-slate-100">
+                              {item.lessons.length} Aulas
+                          </span>
+                      </div>
+
+                      <h3 className="text-lg font-bold text-slate-900 mb-2 font-display">{item.title}</h3>
+                      <p className="text-sm text-slate-500 mb-4">{item.description}</p>
+
+                      <div className="flex flex-wrap gap-2 mb-4">
+                          {item.topics.slice(0, 3).map((topic, i) => (
+                              <span key={i} className="text-[10px] font-semibold text-slate-600 px-2 py-1 rounded bg-slate-50 border border-slate-100 group-hover:border-brand-100 transition-colors">
+                                  {topic}
+                              </span>
+                          ))}
+                          {item.topics.length > 3 && (
+                               <span className="text-[10px] font-semibold text-slate-400 px-2 py-1">...</span>
+                          )}
+                      </div>
+                  </div>
+
+                  {/* Dropdown Section */}
+                  <div className={`bg-slate-50 border-t border-slate-100 transition-all duration-300 ${isOpen ? 'max-h-[500px]' : 'max-h-0'} overflow-hidden`}>
+                      <div className="p-4 pt-2">
+                          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 mt-2">Grade de Aulas:</p>
+                          <ul className="space-y-2">
+                              {item.lessons.map((lesson, idx) => (
+                                  <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                                      <Check className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
+                                      <span className="text-xs md:text-sm">{lesson}</span>
+                                  </li>
+                              ))}
+                          </ul>
+                          <div className="mt-4 p-2 bg-brand-50 rounded text-center text-xs text-brand-700 font-medium flex items-center justify-center gap-2">
+                              <FileText className="w-3 h-3" />
+                              Acompanha lista de exercícios
+                          </div>
+                      </div>
+                  </div>
+                  
+                  {/* Toggle Button */}
+                  <button 
+                      onClick={() => setIsOpen(!isOpen)}
+                      className="w-full py-3 bg-white hover:bg-slate-50 text-brand-600 font-bold text-sm border-t border-slate-100 flex items-center justify-center gap-2 transition-colors"
+                  >
+                      {isOpen ? 'Recolher Grade' : 'Ver Grade de Aulas'}
+                      {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+              </div>
+          );
+      };
+
+      const Curriculum = () => {
+        return (
+          <section className="py-24 bg-brand-50 relative">
+            <div className="container mx-auto px-4 relative z-10">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                  <h2 className="text-3xl md:text-4xl font-display font-bold mt-4 text-slate-900">
+                      Conteúdo completo
+                  </h2>
+                  <p className="text-slate-600 mt-4 text-lg">
+                      Organizado por pastas, séries e bimestres. Tudo pronto para usar.
+                  </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto items-start">
+                {CURRICULUM.map((item) => (
+                   <CurriculumCard key={item.id} item={item} />
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // TESTIMONIALS
+      const Testimonials = () => {
+        return (
+          <section className="py-24 bg-white">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 mb-4">
+                  Aprovado por quem ensina
+                </h2>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {TESTIMONIALS.map((t, idx) => (
+                  <div key={t.id} className="bg-slate-50 p-8 rounded-3xl relative flex flex-col hover:bg-white hover:shadow-xl transition-all duration-300 border border-slate-100">
+                    <div className="flex gap-1 mb-4 text-accent-400">
+                       {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                    </div>
+                    <p className="text-slate-700 text-lg leading-relaxed mb-6 font-medium">"{t.content}"</p>
+                    
+                    <div className="mt-auto flex items-center gap-4">
+                      <img src={t.image} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-sm">{t.name}</h4>
+                        <p className="text-xs text-slate-500">{t.role}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // PRICING
+      const Pricing = () => {
+        return (
+          <section id="pricing" className="py-24 bg-white relative overflow-hidden">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-brand-50 via-white to-accent-50 opacity-50 -z-10 rounded-full blur-3xl"></div>
+
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row relative z-10">
+                  
+                  <div className="md:w-3/5 p-8 md:p-12">
+                      <h3 className="text-3xl font-display font-bold text-slate-900 mb-4">O que está incluso?</h3>
+                      <p className="text-slate-600 mb-8">
+                          Acesso imediato à plataforma com todo o material organizado.
+                      </p>
+                      
+                      <div className="space-y-4">
+                      {[
+                          "1.500+ slides editáveis (PPTX)",
+                          "Fundamental 2 e Ensino Médio Completo",
+                          "Animações prontas em todos os slides",
+                          "Bônus: Curso 'Domine o PowerPoint'",
+                          "Bônus: Banco de Questões Editáveis",
+                          "Acesso Vitalício + Atualizações 2025",
+                          "Suporte prioritário"
+                      ].map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-3">
+                              <div className="flex-shrink-0 w-5 h-5 bg-brand-100 rounded-full flex items-center justify-center">
+                                  <Check className="w-3 h-3 text-brand-600 stroke-[3px]" />
+                              </div>
+                              <span className="text-slate-700 text-sm font-medium">{item}</span>
+                          </div>
+                      ))}
+                      </div>
+
+                      <div className="mt-8 pt-6 border-t border-slate-100 flex items-center gap-2 text-slate-400 text-xs font-medium">
+                          <ShieldCheck className="w-4 h-4" />
+                          <span>7 dias de garantia incondicional</span>
+                      </div>
+                  </div>
+
+                  <div className="md:w-2/5 bg-brand-600 p-8 md:p-12 text-center text-white flex flex-col justify-center relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-500 opacity-20 rounded-full -ml-10 -mb-10"></div>
+                      
+                      <div className="relative z-10">
+                          <div className="inline-block bg-accent-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-6 shadow-lg">
+                              Oferta Especial
+                          </div>
+                          
+                          <div className="opacity-70 text-sm line-through mb-1">De R$ 197,00</div>
+                          
+                          <div className="flex items-center justify-center gap-1 mb-2">
+                             <span className="text-4xl font-display font-bold">R$ 97</span>
+                             <span className="text-xl font-medium opacity-80">,00</span>
+                          </div>
+                          <p className="text-brand-200 text-xs mb-8">Pagamento único. Acesso vitalício.</p>
+
+                          <button className="w-full bg-white text-brand-700 font-bold py-4 px-6 rounded-xl shadow-lg hover:bg-brand-50 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                              Comprar Agora
+                              <ArrowRight className="w-4 h-4" />
+                          </button>
+                          <p className="text-white/40 text-[10px] mt-4">Compra processada pela Hotmart</p>
+                      </div>
+                  </div>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // FAQ
+      const Faq = () => {
+        const [openIndex, setOpenIndex] = useState(0);
+
+        const toggle = (index) => {
+          setOpenIndex(openIndex === index ? null : index);
+        };
+
+        return (
+          <section className="py-20 bg-slate-50">
+            <div className="container mx-auto px-4 max-w-3xl">
+              <h2 className="text-3xl font-display font-bold text-center text-slate-900 mb-12">
+                Perguntas Frequentes
+              </h2>
+
+              <div className="space-y-4">
+                {FAQ_ITEMS.map((item, index) => (
+                  <div key={index} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                    <button
+                      onClick={() => toggle(index)}
+                      className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
+                    >
+                      <span className="font-semibold text-slate-900">{item.question}</span>
+                      {openIndex === index ? (
+                        <ChevronUp className="w-5 h-5 text-brand-600" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-slate-400" />
+                      )}
+                    </button>
+                    {openIndex === index && (
+                      <div className="px-6 pb-6 pt-0 text-slate-600 animate-fade-in">
+                        {item.answer}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // FOOTER
+      const Footer = () => {
+        return (
+          <footer className="bg-white border-t border-slate-200 py-12">
+            <div className="container mx-auto px-4 text-center">
+              <div className="flex items-center justify-center gap-2 mb-6">
+                  <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold font-display">
+                      M
+                  </div>
+                  <span className="font-display font-bold text-xl text-slate-900">MathMaster</span>
+              </div>
+              <p className="text-slate-500 text-sm mb-6">
+                © {new Date().getFullYear()} MathMaster Slides. Todos os direitos reservados.
+              </p>
+              <div className="flex justify-center gap-6 text-sm text-slate-400">
+                <a href="#" className="hover:text-brand-600">Termos de Uso</a>
+                <a href="#" className="hover:text-brand-600">Política de Privacidade</a>
+                <a href="#" className="hover:text-brand-600">Contato</a>
+              </div>
+            </div>
+          </footer>
+        );
+      };
+
+      // APP
+      function App() {
+        return (
+          <div className="min-h-screen flex flex-col font-sans">
+            <main className="flex-grow">
+              <Hero />
+              <Features />
+              <Samples />
+              <Curriculum />
+              <Testimonials />
+              <Pricing />
+              <Faq />
+            </main>
+            <Footer />
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
