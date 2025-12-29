@@ -26,10 +26,7 @@ export const Hero = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-              <a href="#pricing" className="w-full sm:w-auto px-8 py-4 bg-[#c43e1c] hover:bg-[#a03316] text-white rounded-lg font-bold text-lg shadow-xl shadow-orange-900/10 transition-all flex items-center justify-center gap-3 transform hover:-translate-y-1">
-                Baixar Kit Completo
-                <ArrowRight className="w-5 h-5 opacity-90" />
-              </a>
+
 
             </div>
 
