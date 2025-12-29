@@ -1,20 +1,28 @@
-# Logs
+# dependências
+node_modules
+
+# variáveis de ambiente
+.env
+.env.*
+*.local
+
+# código fonte (NÃO subir)
+components
+*.ts
+*.tsx
+vite.config.ts
+tsconfig.json
+package.json
+package-lock.json
+
+# logs
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-.env
-.env.*
-dist-ssr
-*.local
-
-# Editor directories and files
+# editor / sistema
 .vscode/*
 !.vscode/extensions.json
 .idea
