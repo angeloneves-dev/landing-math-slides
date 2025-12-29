@@ -8,7 +8,7 @@ export const CURRICULUM: CurriculumItem[] = [
     description: 'Figuras, áreas, volumes e propriedades visualizadas em 3D.',
     topics: ['Números', 'Grandezas e medidas', 'Álgebra', 'Geometria', 'Probabilidade e Estatística'],
     lessons: [
-        "Ponto, Reta e Plano: Conceitos Primitivos",
+        "TT",
         "Ângulos: Definição e Classificação",
         "Triângulos: Propriedades e Classificação",
         "Teorema de Pitágoras (com demonstração visual)",
